@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GA || Blog</title>
+	<link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css" />
+	<script src="https://use.fontawesome.com/2ae980122e.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<style>
+		*, 
+		*:before,
+		*:after {
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: 'Lato', 'Oswald', sans-serif;
+			background: #fff;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+		}
+
+		.wrapper {
+			position: relative;
+		}
+
+		#header {
+			height: 200vh;
+			width: 100%;
+			position: relative;
+			z-index: 997;
+			overflow: hidden;
+		}
+
+		.bgblur {
+			opacity: 0;
+			background: url('http://i1378.photobucket.com/albums/ah88/mjv123/blogbgblur_zpsm9ys9spp.jpeg');
+		}
+
+		.bgclear {
+			background: url('http://i1378.photobucket.com/albums/ah88/mjv123/blogbg_zpsnjeprzfy.jpeg');
+		}
+
+		.backdrop {
+			position: absolute;
+			height: 100%;
+			width: 100%;
+			background-size: cover;
+			background-position: 50% 50%;
+			background-attachment: fixed;
+		}
+
+		.scroll-btn {
+			position: fixed;
+			bottom: 60px;
+			left: 50%;
+			height: 40px;
+			width: 85px;
+			font-size: 18px;
+			line-height: 40px;
+			color: #fff;
+			background: transparent;
+			transform: translateX(-50%);
+			cursor: pointer;
+			border: 2px solid #fff;
+			z-index: 999;
+			border-radius: 10px;
+		}
+
+		.scroll-btn::before {
+			content: 'Click or scroll';
+			position: absolute;
+			top: -100px;
+			left: 50%;
+			height: 80px;
+			width: 100px;
+			background: #fff;
+			font-size: 16px;
+			line-height: 22px;
+			text-align: center;
+			padding: 15px 10px 0;
+			color: #3b3632;
+			transform: translateX(-50%) rotate(45deg);
+			transform-origin: 50% 200px;
+			transition: all 0.4s;
+			opacity: 0;
+			pointer-events: none;
+			border-radius: 20px;
+		}
+
+		.scroll-btn::after {
+			content: '';
+			position: absolute;
+			top: -22px;
+			left: 50%;
+			height: 0;
+			width: 0;
+			border: 10px solid transparent;
+			border-top: 10px solid #fff;
+			transform: translateX(-50%) rotate(45deg);
+			transform-origin: 50% 100px;
+			transition: all 0.4s;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.scroll-btn:focus,
+		.scroll-btn:active,
+		.scroll-up-btn:focus,
+		.scroll-up-btn:active {
+			box-shadow: none;
+			outline: none;
+		}
+
+		.scroll-btn-inner {
+			position: relative;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			overflow: hidden;
+		}
+
+		.scroll-btn span {
+			display: block;
+			transition: all 0.4s;
+		}
+
+		.scroll-btn:hover span {
+			transform: translate3d(0, -100%, 0);
+		}
+
+		.scroll-btn:hover::before,
+		.scroll-btn:hover::after {
+			transform: translateX(-50%) rotate(0deg);
+			opacity: 1;
+		}
+
+		.hide {
+			opacity: 0;
+			display: none;
+		}
+
+		.overlay {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background: #1b151b;
+			opacity: 0;
+		}
+
+		.title-img-container {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			height: 320px;
+			width: 300px;
+			transform: translate(-50%, -50%);
+		}
+
+		.title-img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			-webkit-clip-path: url(#clipPath);
+			clip-path: url(#clipPath);
+			opacity: 1;
+		}
+
+		.title-img-container.unfix {
+			position: relative;
+			bottom: 200px;
+		}
+
+		.main-header {
+			position: fixed;
+			top: 45%;
+			left: 50%;
+			height: 100px;
+			padding: 30px;
+			transition: all 0.8s;
+			color: #fff;
+			background: rgba(27, 21, 27, 0);
+			z-index: 999;
+			transform: translateX(-50%);
+		}
+
+		.main-header.fixed {
+			top: 0;
+			left: 0;
+			display: flex;
+			align-items: center;
+			margin-left: 0;
+     		justify-content: space-between;
+			transform: translateX(0);
+		}
+
+		.main-header.expanded {
+			width: 100%;
+		}
+
+		.main-left {
+			float: left;
+		}
+
+		.main-right {
+			display: none;
+			float: right;
+		}
+
+		.main-header.expanded .main-right {
+			display: block;
+		}
+
+		.main-right a {
+			opacity: 0;
+			display: inline-block;
+			font-size: 40px;
+			margin-left: 20px;
+			color: #fff;
+			text-decoration: none;
+			border: none;
+			transition: color 0.3s;
+		}
+
+		.main-right a:hover {
+			color: #99aebb;
+		}
+
+		.main-right a:active {
+			border: none;
+			color: ;
+		}
+
+		.switch .main-header {
+			top: 0;
+			left: 0;
+			transform: translate(0, 0);
+			width: 100%;
+		}
+
+		.post-container {
+			padding-top: 100px;
+			width: 80%;
+			margin: 0 auto;
+		}
+
+		article {
+			position: relative;
+			color: #3b3632;
+			background: #fff;
+			padding: 30px;
+			margin: 0 auto 30px;
+		}
+
+		article::after {
+			content: '';
+			position: absolute;
+			height: 1px;
+			width: 95%;
+			background: #3b3632;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+
+		article h2 {
+			color:#fff;
+			background: #3b3632;
+			margin-bottom: 10px;
+			padding: 15px 10px;
+			font-weight: 300;
+		}
+
+		article time,
+		article p {
+			padding-left: 15px;
+		}
+
+		article time {
+			margin-bottom: 20px;
+			display: inline-block;
+			font-style: italic;
+		}
+
+		article p {
+			max-height: 250px;
+			line-height: 1.8em;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			margin-bottom: 30px;
+		}
+
+		article footer {
+			padding: 15px 10px;
+		}
+
+		article .like-icon {
+			padding: 0 10px;
+			cursor: pointer;
+			transition: color 0.3s;
+		}
+
+		article .like-icon:hover {
+			color: #040101;
+		}
+
+		article .like-icon.clicked {
+			color: #009437;
+		}
+
+		article footer .likes {
+
+		}
+
+		article footer .more {
+			float: right;
+			cursor: pointer;
+		}
+
+		.scroll-up-btn {
+			position: fixed;
+			bottom: 40px;
+			right: 40px;
+			height: 40px;
+			width: 40px;
+			font-size: 24px;
+			line-height: 24px;
+			color: #fff;
+			background: #3b3632;
+			border: none;
+			cursor: pointer;
+			opacity: 0.7;
+			transition: opacity 0.5s;
+		}
+
+		.scroll-up-btn:hover {
+			opacity: 1;
+		}
+
+		.mobile-social {
+			position: absolute;
+			top: 0;
+			right: 0;
+			display: none;
+			height: 100px;
+			width: 150px;
+			font-size: 22px;
+			text-align: center;
+		}
+
+		.mobile-social .menu-trigger {
+			position: absolute;
+			top: 45%;
+			right: 10%;
+			display: inline-block;
+			height: 40px;
+			width: 40px;
+			transform: translate(-50%, -50%);
+			cursor: pointer;
+		}
+
+		.mobile-social .menu-icon {
+			position: absolute;
+			top: 50%;
+			width: 100%;
+			height: 3px;
+			transform: translate(-50%);
+			background: #fff;
+			opacity: 1;
+		}
+
+		.mobile-social .menu-icon::before,
+		.mobile-social .menu-icon::after {
+			content: '';
+			position: absolute;
+			height: 3px;
+			width: 100%;
+			background: #fff;
+			transition: transform 0.3s;
+
+		}
+
+		.mobile-social .menu-icon::before{
+			transform: translate3d(-50%, -12px, 0);
+		}
+
+		.mobile-social .menu-icon::after {
+			transform: translate3d(-50%, 12px, 0);
+		}
+
+		.mobile-social.menu-open .menu-icon::before,
+		.menu-trigger:hover .menu-icon::before {
+			transform: translate3d(-50%, -14px, 0);
+		}
+
+		.mobile-social.menu-open .menu-icon::after,
+		.menu-trigger:hover .menu-icon::after {
+			transform: translate3d(-50%, 14px, 0);
+		}
+
+		.mobile-social .mobile-social-menu {
+			list-style-type: none;
+			color: #fff;
+			position: absolute;
+			top: 100px;
+			width: 100%;
+			overflow: hidden;
+		}
+
+		.mobile-social.open .mobile-social-menu {
+			display: block;
+		}
+
+		.mobile-social-menu li {
+			width: 100%;
+			background: rgba(27, 21, 27, 0);
+			padding: 10px 18px;
+			transform: translate3d(100%, 0, 0);
+			transition: transform 0.4s;
+		}
+
+		.mobile-social.open .mobile-social-menu li {
+			transform: translate3d(0, 0, 0);
+		}
+
+		.mobile-social.open .mobile-social-menu li:nth-child(2) {
+			transition-delay: 0.15s;
+		}
+
+		.mobile-social.open .mobile-social-menu li:nth-child(3) {
+			transition-delay: 0.3s;
+		}
+
+		.mobile-social-menu li a {
+			display: inline-block;
+			color: #fff;
+			text-decoration: none;
+			width: 100%;
+		}
+
+		.mobile-social-menu li:hover {
+			opacity: 0.8;
+		}
+
+		@media screen and (max-width: 500px) {
+			.main-header {
+				text-align: center;
+			}
+
+			.main-header .main-right {
+				display: none;
+			}
+
+			.main-header .main-right a {
+				display: none;
+			}
+
+			.main-header.expanded .mobile-social {
+				display: block;
+			}			
+
+			article {
+				padding: 30px 0;
+			}
+
+			article h2 {
+				font-size: 1.2em;
+			}
+
+			article p {
+				font-size: 0.9em;
+			}
+
+			article time,
+			article p {
+			padding-left: 0;
+		}
+
+			.scroll-btn::before,
+			.scroll-btn::after {
+				display: none;
+			}
+			.scroll-up-btn {
+				bottom: 10px;
+				right: 10px;
+			}
+		}
+
+		@media screen and (max-width: 400px) {
+			.post-container {
+				width: 85%;
+			}
+
+			article h2 {
+				font-size: 1.1em;
+			}
+
+			footer span {
+				font-size: 0.8em;
+			}
+		}  
+
+	</style>
+</head>
+<body>
+	<div class="wrapper">
+
+		<div id="header">
+			<div class="backdrop bgclear"></div>
+			<div class="backdrop bgblur"></div>
+
+			<div class="title-img-container">
+				<img class="title-img" src="http://i1378.photobucket.com/albums/ah88/mjv123/cloud_zpsbdahlvxx.jpeg">
+				<svg height="0" width="0">
+					<defs>
+						<clipPath id="clipPath">
+							<text x="30" y="225" textLength="200px" lengthAdjust="spacing" font-family="FontAwesome" font-size="220px" font-weight="700" font-style="normal">&#xf0c2;</text>
+						</clipPath>
+					</defs>
+				</svg>
+			</div>
+
+			<div class="main-header">
+				<div class="main-left">
+					<h1>aSimple<span class="blog-boxes">Blog.</span></h1>
+				</div>
+				<div class="main-right">
+					<a href="#"><span><i class="fa fa-twitter-square"></i></span></a>
+					<a href="#"><span><i class="fa fa-linkedin-square"></i></span></a>
+					<a href="#"><span><i class="fa fa-github-square"></i></span></a>
+				</div>
+				<div class="mobile-social">
+					<span class="menu-trigger"><span class="menu-icon"></span></span>
+					<ul class="mobile-social-menu">
+						<li><a href="#"><span>twitter</span></a></li>
+						<li><a href="#"><span>linkedIn</span></a></li>
+						<li><a href="#"><span>github</span></a></li>
+					</ul>
+				</div>
+			</div>
+
+			<button class="scroll-btn">
+				<div class="scroll-btn-inner">
+					<span>Scroll</span><span><i class="fa fa-angle-double-down"></i></span>
+				</div>
+			</button>
+
+			<div class="overlay"></div>
+		</div>
+
+		<div class="post-container">
+			<article>
+				<div>
+					<h2>"Why, as for that..."</h2>
+					<time datetime="2016-07-05 08:57">July 5th 2016, 08:57am</time>
+					<p>"Why, as for that," answered Oz, "I think you are wrong to want a heart.  It makes most people unhappy.  If you only knew it, you are in luck not to have a heart." "That must be a matter of opinion," said the Tin Woodman.  "For my part, I will bear all the unhappiness without a murmur, if you will give me the heart." "Very well," answered Oz meekly.  "Come to me tomorrow and you shall have a heart.  I have played Wizard for so many years that I may as well continue the part a little longer." "And now," said Dorothy, "how am I to get back to Kansas?" "We shall have to think about that," replied the little man.  "Give me two or three days to consider the matter and I'll try to find a way to carry you over the desert.  In the meantime you shall all be treated as my guests, and while you live in the Palace my people will wait upon you and obey your slightest wish.  There is only one thing I ask in return for my help--such as it is.  You must keep my secret and tell no one I am a humbug." They agreed to say nothing of what they had learned, and went back to their rooms in high spirits.  Even Dorothy had hope that "The Great and Terrible Humbug," as she called him, would find a way to send her back to Kansas, and if he did she was willing to forgive him everything. Next morning the Scarecrow said to his friends: "Congratulate me.</p>
+					<footer>
+						<span>Like<i class="fa fa-heart like-icon"></i></span>
+						<span class="likes">0</span><span> people like this</span>
+						<span class="more">Read more...</span>
+					</footer>
+				</div>
+			</article>
+			<article>
+				<div>
+					<h2>"A likely story indeed!..."</h2>
+					<time datetime="2016-05-31 12:57">May 31st 2016, 12:57pm</time>
+					<p>'A likely story indeed!' said the Pigeon in a tone of the deepest  contempt. 'I've seen a good many little girls in my time, but never ONE  with such a neck as that! No, no! You're a serpent; and there's no use  denying it. I suppose you'll be telling me next that you never tasted an  egg!' 'I HAVE tasted eggs, certainly,' said Alice, who was a very truthful  child; 'but little girls eat eggs quite as much as serpents do, you  know.' 'I don't believe it,' said the Pigeon; 'but if they do, why then they're  a kind of serpent, that's all I can say.' This was such a new idea to Alice, that she was quite silent for a  minute or two, which gave the Pigeon the opportunity of adding, 'You're  looking for eggs, I know THAT well enough; and what does it matter to me  whether you're a little girl or a serpent?' 'It matters a good deal to ME,' said Alice hastily; 'but I'm not looking  for eggs, as it happens; and if I was, I shouldn't want YOURS: I don't  like them raw.' 'Well, be off, then!' said the Pigeon in a sulky tone, as it settled  down again into its nest. Alice crouched down among the trees as well as  she could, for her neck kept getting entangled among the branches, and  every now and then she had to stop and untwist it. After a while she  remembered that she still held the pieces of mushroom in her hands, and  she set to work very carefully, nibbling first at one and then at the  other, and growing sometimes taller and sometimes shorter, until she had  succeeded in bringing herself down to her usual height. It</p>
+					<footer>
+						<span>Like<i class="fa fa-heart like-icon"></i></span>
+						<span class="likes">0</span><span> people like this</span>
+						<span class="more">Read more...</span>
+					</footer>
+				</div>
+			</article>
+			<article>
+				<div>
+					<h2>"Line! line!" cried Queequeg...</h2>
+					<time datetime="2016-03-13 14:09">March 13th 2016, 02:09pm</time>
+					<p>"Line! line!" cried Queequeg, looking over the gunwale; "him fast! him fast!&mdash;Who line him! Who struck?&mdash;Two whale; one big, one little!" "What ails ye, man?" cried Starbuck. "Look-e here," said Queequeg, pointing down. As when the stricken whale, that from the tub has reeled out hundreds of fathoms of rope; as, after deep sounding, he floats up again, and shows the slackened curling line buoyantly rising and spiralling towards the air; so now, Starbuck saw long coils of the umbilical cord of Madame Leviathan, by which the young cub seemed still tethered to its dam. Not seldom in the rapid vicissitudes of the chase, this natural line, with the maternal end loose, becomes entangled with the hempen one, so that the cub is thereby trapped. Some of the subtlest secrets of the seas seemed divulged to us in this enchanted pond. We saw young Leviathan amours in the deep.* *The sperm whale, as with all other species of the Leviathan, but unlike most other fish, breeds indifferently at all seasons; after a gestation which may probably be set down at nine months, producing but one at a time; though in some few known instances giving birth to an Esau and</p>
+					<footer>
+						<span>Like<i class="fa fa-heart like-icon"></i></span>
+						<span class="likes">0</span><span> people like this</span>
+						<span class="more">Read more...</span>
+					</footer>
+				</div>
+			</article>
+			<article>
+				<div>
+					<h2>Two men came past them...</h2>
+					<time datetime="2016-01-01 00:00">January 1st 2016, 00.00am</time>
+					<p>Two men came past them.  Then a dirty woman, carrying a heavy bundle and weeping.  A lost retriever dog, with hanging tongue, circled dubiously round them, scared and wretched, and fled at my brother's threat. So much as they could see of the road Londonward between the houses to the right was a tumultuous stream of dirty, hurrying people, pent in between the villas on either side; the black heads, the crowded forms, grew into distinctness as they rushed towards the corner, hurried past, and merged their individuality again in a receding multitude that was swallowed up at last in a cloud of dust. "Go on!  Go on!" cried the voices.  "Way!  Way!" One man's hands pressed on the back of another.  My brother stood at the pony's head.  Irresistibly attracted, he advanced slowly, pace by pace, down the lane. Edgware had been a scene of confusion, Chalk Farm a riotous tumult, but this was a whole population in movement.  It is hard to imagine that host.  It had no character of its own.  The figures poured out past the corner, and receded with their backs to the group in the lane.  Along the margin came those who were on foot threatened by the wheels, stumbling in the ditches, blundering into one another. The carts and carriages crowded close upon one another, making little way for those swifter and more impatient vehicles that darted forward every now and then when an opportunity showed itself of doing so, sending the people scattering against the fences and gates of the villas. "Push on!" was the cry.  "Push on!  They are coming!" In one cart stood a blind man in the uniform of the Salvation Army, gesticulating with his crooked</p>
+					<footer>
+						<span>Like<i class="fa fa-heart like-icon"></i></span>
+						<span class="likes">0</span><span> people like this</span>
+						<span class="more">Read more...</span>
+					</footer>
+				</div>
+			</article>
+			<article>
+				<div>
+					<h2>"No!" "No?" "No. I am setting out for Bordeux..."</h2>
+					<time datetime="2015-31-12 23:59">December 31st 2015, 11:59pm</time>
+					<p>"No!" "No?" "No.  I am setting out for Bordeaux, and shall go to Bordeaux." "Money is no object?" "None." The captain spoke in a tone which did not admit of a reply. "But the owners of the Henrietta&mdash;" resumed Phileas Fogg. "The owners are myself," replied the captain.  "The vessel belongs to me." "I will freight it for you." "No." "I will buy it of you." "No." Phileas Fogg did not betray the least disappointment; but the situation was a grave one.  It was not at New York as at Hong Kong, nor with the captain of the Henrietta as with the captain of the Tankadere.  Up to this time money had smoothed away every obstacle.  Now money failed. Still, some means must be found to cross the Atlantic on a boat, unless by balloon&mdash;which would have been venturesome, besides not being capable of being put in practice.  It seemed that Phileas Fogg had an idea, for he said to the captain, "Well, will you carry me to Bordeaux?" "No, not if you paid me two hundred dollars." "I offer you two thousand." "Apiece?" "Apiece." "And there are four of you?" "Four." Captain Speedy began to scratch his head.  There were eight thousand dollars to gain, without changing his route; for which it was well worth conquering the repugnance he had for all kinds of passengers. Besides, passenger's at two thousand dollars are no longer passengers, but valuable merchandise.  "I start at nine o'clock," said Captain Speedy, simply.  "Are you and your party ready?" "We will be on board at nine</p>
+					<footer>
+						<span>Like<i class="fa fa-heart like-icon"></i></span>
+						<span class="likes">0</span><span> people like this</span>
+						<span class="more">Read more...</span>
+					</footer>
+				</div>
+			</article>
+		</div> <!-- post-container -->
+
+		<button class="scroll-up-btn"><span><i class="fa fa-angle-double-up"></i></span></button>
+
+	</div> <!-- wrapper -->
+	<script>
+
+	(function($){
+
+			window.onbeforeunload = function(){
+				window.scrollTo(0, 0);
+			}
+
+			var view = getViewport();
+			var $win = $(window);
+			var $bgblur = $('.bgblur');
+			var $overlay = $('.overlay');
+			var $head = $('#header');
+			var $scrBtn = $('.scroll-btn');
+			var $scrUpBtn = $('.scroll-up-btn');
+			var ready = true;
+			var scr, oVal,
+				hh = $head.outerHeight();
+
+			function getViewport() {
+				return {
+					h : window.innerHeight,
+					w : window.innerWidth
+				}
+			}
+
+			$win.scroll(function() {
+				if(ready) {
+					window.requestAnimationFrame(function(){
+						scr = window.scrollY;
+						oVal = scr / (1.1 * hh);
+						fade(oVal);
+						ready = true;
+					});
+				}
+
+				if(scr > hh - (view.h * 0.7)) {
+					$('.scroll-btn').addClass('hide');
+					$('.title-img-container').addClass('unfix');
+				} else {
+					$('.scroll-btn').removeClass('hide');
+					$('.title-img-container').removeClass('unfix');
+				}
+
+				if(scr > (hh + (view.h/2))) {
+					$('.scroll-up-btn').removeClass('hide');
+				} else {
+					$('.scroll-up-btn').addClass('hide');
+				}
+
+				if(scr > (hh - (view.h * 0.7))) {
+					$('.main-header').addClass('fixed');
+					window.setTimeout(function(){
+						$('.main-header').addClass('expanded');
+					}, 800);
+					$('.main-right').children('a').each(function(i, e){
+						$(this).delay(i * 1500).animate({opacity: 1}, 1000);
+					});
+				}
+
+				ready = false;
+
+			});
+
+			$('.like-icon').one('click', function(){
+				var text = '';
+				$(this).addClass('clicked');
+				var likes = (parseInt($(this).parent().next('.likes').text(), 10) + 1);
+				$(this).parent().next('.likes').html(likes);
+				text = likes > 1 ? " people like this" : " person likes this";
+				$(this).parent().next().next().text(text);
+			});
+
+			$scrBtn.click(function(){
+				$('html, body').animate({
+					scrollTop : hh
+				}, 4000, 'easeOutExpo');
+			});
+
+			$scrUpBtn.click(function() {
+				$('html, body').animate({
+					scrollTop : hh
+				}, 1500, 'easeOutExpo');
+			});
+
+			$('.menu-trigger').click(function(){
+				$('.mobile-social').toggleClass('open');
+			});
+
+			function fade(oVal) {
+				$bgblur.css('opacity', oVal);
+				$overlay.css('opacity', oVal);
+				$('.main-header, .mobile-social-menu li').css('background', 'rgba(27, 21, 27,' + oVal + ')');
+				imgO =  1/(oVal * 2.5);
+				$('.title-img-container').css('opacity', imgO);
+			}
+		
+	})(jQuery);
+
+	</script>
+</body>
+</html>
